@@ -16,6 +16,13 @@ h1 { font-size: 48px; margin: 0; text-shadow: 0 0 20px var(--error); }
 p { color: #888; margin-top: 20px; font-size: 14px; }
 
 .error-code { color: #00ffcc; margin-top: 30px; font-size: 12px; }
+
+.counter-info {
+    color: #555;
+    margin-top: 20px;
+    font-size: 11px;
+    font-style: italic;
+}
 </style>
 </head>
 <body>
@@ -23,7 +30,40 @@ p { color: #888; margin-top: 20px; font-size: 14px; }
     <h1>404</h1>
     <p>Connection lost</p>
     <p>zgvszxrl entity not found</p>
-    <div class="error-code">Session terminated at 2025-03-17 23:47:12</div>
+    <div class="error-code" id="timestamp">Session terminated at 2025-08-25 23:47:12</div>
+
+    <div class="counter-info" id="counter-info">
+        <span style="color:#ff003c">警告：</span>检测到
+        <span id="investigator-count" style="color:#00ffcc">0</span>
+        名调查员已参与抹除协议
+    </div>
 </div>
+
+<script>
+// 显示用户访问的实时时间
+(function() {
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10);
+    const timeStr = now.toTimeString().slice(0, 8); // 获取当前HH:MM:SS
+    document.getElementById('timestamp').textContent = 'Session terminated at ' + dateStr + ' ' + timeStr;
+})();
+
+// 从后端API获取调查员计数
+async function showCount() {
+    try {
+        const res = await fetch('https://r0xjveni-api.vercel.app/api/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'get_count' })
+        });
+        const data = await res.json();
+        document.getElementById('investigator-count').textContent = data.count || 0;
+    } catch (err) {
+        document.getElementById('counter-info').style.display = 'none';
+    }
+}
+
+showCount();
+</script>
 </body>
 </html>
